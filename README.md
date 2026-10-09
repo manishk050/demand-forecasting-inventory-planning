@@ -2,7 +2,7 @@
 
 **Demand forecasting is only useful if the replenishment decision improves.** This project applies time-series ML to the M5 retail dataset, then evaluates whether a simulated forecast-based replenishment policy can cut costs **without reducing customer availability**.
 
-[Interactive dashboard source](dashboard/) · [Standalone HTML preview](Dashboard_Preview.html) · [Clean notebook](Demand_Forecasting_Inventory_Planning.ipynb) · [Resume bullets](RESUME_BULLETS.md)
+[Interactive dashboard source](dashboard/) · [Standalone HTML preview](Dashboard_Preview.html) · [Clean notebook](Demand_Forecasting_Inventory_Planning.ipynb)
 
 > **Results provenance:** The bundled dashboard JSON and HTML preview initially show original, **archived** notebook results. They are **not** outputs of the revised, stricter forecasting + optimization workflow. Source M5 CSVs are required to generate real revised results. A tiny synthetic fixture was used only to verify the new pipeline functions. The external M5 CSV download was not possible in this environment, so no new real-data savings are claimed. Inventory parameters and costs are always simulated.
 
