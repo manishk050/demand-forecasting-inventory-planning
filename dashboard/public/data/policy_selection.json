@@ -1,0 +1,21 @@
+{
+  "selected_policy": {
+    "strategy": "forecast",
+    "policy": "Forecast \u00d71 / safety 1",
+    "z_score": 1.0,
+    "forecast_multiplier": 1.0,
+    "tuning_fill_rate": 0.9716028066151913,
+    "tuning_cost": 7194.494467115683
+  },
+  "test_decision": {
+    "status": "Outperforms baseline on test",
+    "deployment_recommended": true,
+    "minimum_fill_rate": 0.96,
+    "passes_service_floor": true,
+    "matches_or_exceeds_baseline_fill": true,
+    "lowers_modeled_cost": true,
+    "selected_on": "validation only",
+    "evaluated_on": "untouched 28-day test",
+    "reason": "Selected forecast policy beat baseline cost and service on untouched test."
+  }
+}

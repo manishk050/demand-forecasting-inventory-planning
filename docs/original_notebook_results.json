@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "source": "Archived outputs from the uploaded original notebook \u2014 NOT independently rerun",
+    "validation": "original_lagged_validation",
+    "as_of": "2016-04-24",
+    "forecast_period": "2016-04-25 to 2016-05-22",
+    "horizon_days": 28,
+    "sample_skus": 75,
+    "store_product_pairs": 225,
+    "source_daily_rows": 58327370,
+    "modeled_daily_rows": 430425,
+    "total_units": 65695409,
+    "champion": "Random Forest",
+    "assumptions": "Inventory, lead times and costs are simulated; original validation uses realized lagged sales within the validation window. These are archived, not rerun or production results.",
+    "github_url": "https://github.com/manishk050/demand-forecasting-inventory-planning"
+  },
+  "models": [
+    {
+      "model": "7-Day Moving Average",
+      "mae": 4.841723,
+      "wape": 0.499981
+    },
+    {
+      "model": "Linear Regression",
+      "mae": 3.949109,
+      "wape": 0.407805
+    },
+    {
+      "model": "Random Forest",
+      "mae": 3.77205,
+      "wape": 0.389521
+    },
+    {
+      "model": "XGBoost",
+      "mae": 3.79,
+      "wape": 0.391375
+    }
+  ],
+  "policies": [
+    {
+      "policy": "Fixed Stock",
+      "stockout_units": 2333.241379,
+      "fill_rate": 0.961755,
+      "stockout_rate": 0.040635,
+      "average_inventory": 131.172222,
+      "total_inventory_cost": 20027.562048
+    },
+    {
+      "policy": "Random Forest Forecast",
+      "stockout_units": 4168.018025,
+      "fill_rate": 0.931681,
+      "stockout_rate": 0.073492,
+      "average_inventory": 102.545137,
+      "holding_cost": 12920.687319,
+      "stockout_cost": 6252.027038,
+      "total_inventory_cost": 19172.714357
+    }
+  ],
+  "risk": {
+    "Low": 134,
+    "Medium": 48,
+    "High": 43
+  },
+  "states": [
+    {
+      "state": "California",
+      "units": 28675547
+    },
+    {
+      "state": "Texas",
+      "units": 18899006
+    },
+    {
+      "state": "Wisconsin",
+      "units": 18120856
+    }
+  ],
+  "categories": [
+    {
+      "category": "Foods",
+      "units": 45089939
+    },
+    {
+      "category": "Household",
+      "units": 14480670
+    },
+    {
+      "category": "Hobbies",
+      "units": 6124800
+    }
+  ],
+  "data_quality": {
+    "missing_price_rows": 28063,
+    "missing_price_with_sales": 0,
+    "missing_dates": 0,
+    "duplicate_model_keys": 0
+  },
+  "safety_stock": []
+}

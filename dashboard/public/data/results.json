@@ -1,0 +1,298 @@
+{
+  "meta": {
+    "source": "Recomputed from M5 source files \u2014 chronological validation and untouched test",
+    "validation": "fit / 28-day tuning / untouched 28-day test",
+    "as_of": "2016-04-24",
+    "horizon_days": 28,
+    "sample_skus": 75,
+    "store_product_pairs": 225,
+    "champion": "Random Forest",
+    "required_fill_rate": 0.96,
+    "recommendation_strategy": "forecast",
+    "fit_end": "2016-02-28",
+    "tuning_start": "2016-02-29",
+    "tuning_end": "2016-03-27",
+    "test_start": "2016-03-28",
+    "test_end": "2016-04-24",
+    "assumptions": "All on-hand inventory, lead times, holding costs, and stockout costs are simulated. Sales are a proxy for demand; future prices held at cutoff levels. No production claims.",
+    "github_url": "https://github.com/manishk050/demand-forecasting-inventory-planning"
+  },
+  "models": [
+    {
+      "model": "XGBoost",
+      "wape": 0.46054313739970787,
+      "mae": 4.459812020076409
+    },
+    {
+      "model": "Random Forest",
+      "wape": 0.46578483214611305,
+      "mae": 4.51057159358255
+    },
+    {
+      "model": "Linear Regression",
+      "wape": 0.4712533881885766,
+      "mae": 4.5635280486680445
+    },
+    {
+      "model": "7-Day Moving Average",
+      "wape": 0.5557784768993174,
+      "mae": 5.382052907725961
+    }
+  ],
+  "models_tuning": [
+    {
+      "model": "Random Forest",
+      "wape": 0.45583545594190705,
+      "mae": 4.379927538093239
+    },
+    {
+      "model": "XGBoost",
+      "wape": 0.45704654727708255,
+      "mae": 4.391564395693796
+    },
+    {
+      "model": "Linear Regression",
+      "wape": 0.4719512006912438,
+      "mae": 4.534776822641866
+    },
+    {
+      "model": "7-Day Moving Average",
+      "wape": 0.5059852791410678,
+      "mae": 4.861795696432603
+    }
+  ],
+  "policies": [
+    {
+      "policy": "Fixed order-up-to baseline",
+      "fill_rate": 0.940511106213098,
+      "stockout_rate": 0.07507936507936508,
+      "stockout_units": 3629.29843215132,
+      "average_inventory": 39.79596137904443,
+      "holding_cost": 5014.291133759598,
+      "stockout_cost": 5443.947648226979,
+      "total_inventory_cost": 10458.238781986576,
+      "total_ordered": 59472.01117687435,
+      "strategy": "fixed",
+      "z_score": null,
+      "forecast_multiplier": null
+    },
+    {
+      "policy": "Validation-selected forecast policy",
+      "fill_rate": 0.9765102357711771,
+      "stockout_rate": 0.0326984126984127,
+      "stockout_units": 1433.063536072027,
+      "average_inventory": 40.215439597473576,
+      "holding_cost": 5067.145389281671,
+      "stockout_cost": 2149.5953041080406,
+      "total_inventory_cost": 7216.740693389711,
+      "total_ordered": 61138.14409362736,
+      "strategy": "forecast",
+      "z_score": 1.0,
+      "forecast_multiplier": 1.0
+    }
+  ],
+  "decision": {
+    "status": "Outperforms baseline on test",
+    "deployment_recommended": true,
+    "minimum_fill_rate": 0.96,
+    "passes_service_floor": true,
+    "matches_or_exceeds_baseline_fill": true,
+    "lowers_modeled_cost": true,
+    "selected_on": "validation only",
+    "evaluated_on": "untouched 28-day test",
+    "reason": "Selected forecast policy beat baseline cost and service on untouched test."
+  },
+  "selected_policy": {
+    "strategy": "forecast",
+    "policy": "Forecast \u00d71 / safety 1",
+    "z_score": 1.0,
+    "forecast_multiplier": 1.0,
+    "tuning_fill_rate": 0.9716028066151913,
+    "tuning_cost": 7194.494467115683
+  },
+  "cost_delta_fraction": 0.30994684250086824,
+  "risk": {
+    "High": 84,
+    "Low": 76,
+    "Medium": 65
+  },
+  "tuning_frontier": [
+    {
+      "policy": "Fixed order-up-to baseline",
+      "strategy": "fixed",
+      "z_score": null,
+      "forecast_multiplier": null,
+      "fill_rate": 0.9496988935598751,
+      "total_inventory_cost": 9411.284253230786
+    },
+    {
+      "policy": "Forecast \u00d70.9 / safety 0",
+      "strategy": "forecast",
+      "z_score": 0.0,
+      "forecast_multiplier": 0.9,
+      "fill_rate": 0.887683039255208,
+      "total_inventory_cost": 12476.920958499399
+    },
+    {
+      "policy": "Forecast \u00d70.9 / safety 0.5",
+      "strategy": "forecast",
+      "z_score": 0.5,
+      "forecast_multiplier": 0.9,
+      "fill_rate": 0.9388487391193985,
+      "total_inventory_cost": 8637.053450295429
+    },
+    {
+      "policy": "Forecast \u00d70.9 / safety 1",
+      "strategy": "forecast",
+      "z_score": 1.0,
+      "forecast_multiplier": 0.9,
+      "fill_rate": 0.9641259996220879,
+      "total_inventory_cost": 7298.457839793638
+    },
+    {
+      "policy": "Forecast \u00d70.9 / safety 1.5",
+      "strategy": "forecast",
+      "z_score": 1.5,
+      "forecast_multiplier": 0.9,
+      "fill_rate": 0.9759825329517391,
+      "total_inventory_cost": 7253.493615517034
+    },
+    {
+      "policy": "Forecast \u00d70.9 / safety 2",
+      "strategy": "forecast",
+      "z_score": 2.0,
+      "forecast_multiplier": 0.9,
+      "fill_rate": 0.9814877867537889,
+      "total_inventory_cost": 7817.97264700547
+    },
+    {
+      "policy": "Forecast \u00d70.9 / safety 2.5",
+      "strategy": "forecast",
+      "z_score": 2.5,
+      "forecast_multiplier": 0.9,
+      "fill_rate": 0.9836611534325046,
+      "total_inventory_cost": 8703.45767568987
+    },
+    {
+      "policy": "Forecast \u00d70.9 / safety 3",
+      "strategy": "forecast",
+      "z_score": 3.0,
+      "forecast_multiplier": 0.9,
+      "fill_rate": 0.9849704899948447,
+      "total_inventory_cost": 9672.67490348609
+    },
+    {
+      "policy": "Forecast \u00d71 / safety 0",
+      "strategy": "forecast",
+      "z_score": 0.0,
+      "forecast_multiplier": 1.0,
+      "fill_rate": 0.9193631395806421,
+      "total_inventory_cost": 10033.720865947318
+    },
+    {
+      "policy": "Forecast \u00d71 / safety 0.5",
+      "strategy": "forecast",
+      "z_score": 0.5,
+      "forecast_multiplier": 1.0,
+      "fill_rate": 0.954987648763496,
+      "total_inventory_cost": 7697.609025388221
+    },
+    {
+      "policy": "Forecast \u00d71 / safety 1",
+      "strategy": "forecast",
+      "z_score": 1.0,
+      "forecast_multiplier": 1.0,
+      "fill_rate": 0.9716028066151913,
+      "total_inventory_cost": 7194.494467115683
+    },
+    {
+      "policy": "Forecast \u00d71 / safety 1.5",
+      "strategy": "forecast",
+      "z_score": 1.5,
+      "forecast_multiplier": 1.0,
+      "fill_rate": 0.978998917583334,
+      "total_inventory_cost": 7576.484620971613
+    },
+    {
+      "policy": "Forecast \u00d71 / safety 2",
+      "strategy": "forecast",
+      "z_score": 2.0,
+      "forecast_multiplier": 1.0,
+      "fill_rate": 0.9827386248078248,
+      "total_inventory_cost": 8312.36527873544
+    },
+    {
+      "policy": "Forecast \u00d71 / safety 2.5",
+      "strategy": "forecast",
+      "z_score": 2.5,
+      "forecast_multiplier": 1.0,
+      "fill_rate": 0.9843020286781841,
+      "total_inventory_cost": 9256.50802393393
+    },
+    {
+      "policy": "Forecast \u00d71 / safety 3",
+      "strategy": "forecast",
+      "z_score": 3.0,
+      "forecast_multiplier": 1.0,
+      "fill_rate": 0.9854577902157786,
+      "total_inventory_cost": 10241.49987003423
+    },
+    {
+      "policy": "Forecast \u00d71.1 / safety 0",
+      "strategy": "forecast",
+      "z_score": 0.0,
+      "forecast_multiplier": 1.1,
+      "fill_rate": 0.9398953788713704,
+      "total_inventory_cost": 8671.628894244202
+    },
+    {
+      "policy": "Forecast \u00d71.1 / safety 0.5",
+      "strategy": "forecast",
+      "z_score": 0.5,
+      "forecast_multiplier": 1.1,
+      "fill_rate": 0.9648094609062463,
+      "total_inventory_cost": 7368.293759257429
+    },
+    {
+      "policy": "Forecast \u00d71.1 / safety 1",
+      "strategy": "forecast",
+      "z_score": 1.0,
+      "forecast_multiplier": 1.1,
+      "fill_rate": 0.9757600999840177,
+      "total_inventory_cost": 7407.7636501960715
+    },
+    {
+      "policy": "Forecast \u00d71.1 / safety 1.5",
+      "strategy": "forecast",
+      "z_score": 1.5,
+      "forecast_multiplier": 1.1,
+      "fill_rate": 0.9810100126905815,
+      "total_inventory_cost": 7997.802695628584
+    },
+    {
+      "policy": "Forecast \u00d71.1 / safety 2",
+      "strategy": "forecast",
+      "z_score": 2.0,
+      "forecast_multiplier": 1.1,
+      "fill_rate": 0.9834599099151549,
+      "total_inventory_cost": 8857.703655088695
+    },
+    {
+      "policy": "Forecast \u00d71.1 / safety 2.5",
+      "strategy": "forecast",
+      "z_score": 2.5,
+      "forecast_multiplier": 1.1,
+      "fill_rate": 0.9848503222933114,
+      "total_inventory_cost": 9819.824169848514
+    },
+    {
+      "policy": "Forecast \u00d71.1 / safety 3",
+      "strategy": "forecast",
+      "z_score": 3.0,
+      "forecast_multiplier": 1.1,
+      "fill_rate": 0.9858742264754559,
+      "total_inventory_cost": 10817.65193146443
+    }
+  ],
+  "states": []
+}
