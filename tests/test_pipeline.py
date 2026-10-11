@@ -45,6 +45,17 @@ def test_features_exclude_today_and_tomorrow():
     assert row.lag_28==0 and row.rolling_mean_7==np.mean(range(21,28))
 
 
+def test_new_features_use_only_past_sales():
+    history=make_history(90)
+    featured=add_features(history)
+    row=featured.iloc[0]
+    assert row.lag_1==27 and row.lag_2==26
+    assert row.rolling_mean_14==np.mean(range(14,28))
+    assert row.rolling_std_7==np.std(range(21,28))
+    assert row.rolling_std_28==np.std(range(28))
+    assert row.day_of_month==row.date.day
+
+
 def test_splits_disjoint_and_consecutive():
     f,t,e=chronological_splits(make_history(100))
     assert len(t)==len(e)==28 and len(f)==44
