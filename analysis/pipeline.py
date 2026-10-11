@@ -9,6 +9,7 @@ import argparse
 import json
 from collections import defaultdict
 from dataclasses import dataclass
+from datetime import timedelta
 from pathlib import Path
 
 import numpy as np
@@ -179,7 +180,8 @@ def recursive_forecast(model,history,future):
         rows['week_of_year']=int(pd.Timestamp(day).isocalendar().week)
         rows['is_weekend']=int(pd.Timestamp(day).dayofweek>=5)
         rows['has_event']=rows.event_name_1.notna().astype(int)
-        values=arr[:,3] if model is None else model.predict(rows[FEATURES])
+        # The baseline must use the named 7-day mean; feature positions can change.
+        values=rows['rolling_mean_7'].to_numpy() if model is None else model.predict(rows[FEATURES])
         values=np.maximum(0,np.asarray(values,dtype=float))
         rows['predicted_demand']=values
         predictions.append(rows[['date']+KEYS+['predicted_demand']])
@@ -236,7 +238,6 @@ def simulate_policy(actuals,predictions,inventory,*,policy='forecast',z_score=0,
         raise ValueError('policy must be fixed or forecast')
     if z_score < 0 or forecast_multiplier <= 0:
         raise ValueError('Safety score cannot be negative; multiplier must be positive.')
-    horizon_dates=set(pd.to_datetime(actuals.date))
     if actuals.duplicated(KEYS+['date']).any() or predictions.duplicated(KEYS+['date']).any():
         raise ValueError('Duplicate simulation keys.')
     values=actuals[KEYS+['date','units_sold']].merge(
@@ -245,6 +246,13 @@ def simulate_policy(actuals,predictions,inventory,*,policy='forecast',z_score=0,
     if values.predicted_demand.isna().any():
         raise ValueError('Every simulated date needs a forecast.')
     inputs=inventory.set_index(KEYS)
+    # Use Python date keys for day arithmetic. This avoids NumPy's deprecated
+    # generic timedelta unit on some Python / pandas / NumPy combinations.
+    # Group once instead of filtering the full predictions frame for every SKU.
+    forecast_by_key = {
+        key: dict(zip(group.date.dt.date, group.predicted_demand.astype(float)))
+        for key, group in predictions.groupby(KEYS, sort=False)
+    }
     records=[]
     for key,group in values.groupby(KEYS,sort=True):
         info=inputs.loc[key]
@@ -252,11 +260,9 @@ def simulate_policy(actuals,predictions,inventory,*,policy='forecast',z_score=0,
         lead=int(info.lead_time_days)
         sigma=float(info.demand_std)
         outstanding=defaultdict(float)
-        future=(predictions[(predictions.item_id==key[0]) &
-                            (predictions.store_id==key[1])].set_index('date')
-                            .predicted_demand.sort_index())
+        future=forecast_by_key[key]
         for r in group.sort_values('date').itertuples(index=False):
-            date=pd.Timestamp(r.date)
+            date=pd.Timestamp(r.date).date()
             on_hand+=outstanding.pop(date,0)
             actual=float(r.units_sold)
             served=min(on_hand,actual)
@@ -265,16 +271,16 @@ def simulate_policy(actuals,predictions,inventory,*,policy='forecast',z_score=0,
             if policy=='fixed':
                 target=float(info.fixed_target)
             else:
-                next_days=pd.date_range(date+pd.Timedelta(days=1),periods=lead+1)
-                if not set(next_days).issubset(future.index):
+                next_days=[date + timedelta(days=offset) for offset in range(1,lead+2)]
+                if any(day not in future for day in next_days):
                     raise ValueError('Forecasts need lead time + review period lookahead.')
-                target=(float(future.loc[next_days].sum())*forecast_multiplier+
+                target=(sum(future[day] for day in next_days)*forecast_multiplier+
                         z_score*sigma*np.sqrt(lead+1))
             in_transit=sum(outstanding.values())
             ordered=max(0.0,target-on_hand-in_transit)
             if ordered:
-                outstanding[date+pd.Timedelta(days=lead)]+=ordered
-            records.append({'date':date,'item_id':key[0],'store_id':key[1],
+                outstanding[date + timedelta(days=lead)] += ordered
+            records.append({'date':pd.Timestamp(date),'item_id':key[0],'store_id':key[1],
                  'policy':policy,'actual_demand':actual,'fulfilled':served,
                  'stockout_units':shortage,'ending_inventory':on_hand,
                  'order_qty':ordered,'holding_cost':on_hand*float(info.holding_cost),
