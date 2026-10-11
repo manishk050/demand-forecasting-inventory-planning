@@ -22,8 +22,10 @@ STORES = ('CA_1', 'TX_1', 'WI_1')
 KEYS = ['item_id', 'store_id']
 HORIZON = 28
 FEATURES = [
-    'lag_7', 'lag_14', 'lag_28', 'rolling_mean_7', 'rolling_mean_28',
-    'day_of_week', 'month', 'week_of_year', 'is_weekend', 'sell_price',
+    'lag_1', 'lag_2', 'lag_7', 'lag_14', 'lag_28',
+    'rolling_mean_7', 'rolling_mean_14', 'rolling_mean_28',
+    'rolling_std_7', 'rolling_std_28',
+    'day_of_week', 'day_of_month', 'month', 'week_of_year', 'is_weekend', 'sell_price',
     'price_change', 'snap_CA', 'snap_TX', 'snap_WI', 'has_event',
 ]
 SAFETY_MULTIPLIERS = (0, .5, 1, 1.5, 2, 2.5, 3)
@@ -93,11 +95,14 @@ def load_m5(cfg: Config):
 def add_features(data):
     f = data.sort_values(KEYS+['date']).copy()
     g = f.groupby(KEYS,sort=False)
-    for lag in (7,14,28):
+    for lag in (1,2,7,14,28):
         f[f'lag_{lag}'] = g.units_sold.shift(lag)
-    for n in (7,28):
+    for n in (7,14,28):
         f[f'rolling_mean_{n}'] = g.units_sold.transform(lambda x: x.shift(1).rolling(n).mean())
+    for n in (7,28):
+        f[f'rolling_std_{n}'] = g.units_sold.transform(lambda x: x.shift(1).rolling(n).std(ddof=0))
     f['day_of_week'] = f.date.dt.dayofweek
+    f['day_of_month'] = f.date.dt.day
     f['month'] = f.date.dt.month
     f['week_of_year'] = f.date.dt.isocalendar().week.astype(int)
     f['is_weekend'] = (f.day_of_week >= 5).astype(int)
@@ -160,12 +165,16 @@ def recursive_forecast(model,history,future):
             if len(h) < 28:
                 raise ValueError('Minimum history per store-SKU is 28 days.')
             change = (r.sell_price-p[-1])/p[-1] if p[-1] != 0 else 0
-            lagged.append([h[-7],h[-14],h[-28],np.mean(h[-7:]),np.mean(h[-28:]),change])
+            lagged.append([h[-1],h[-2],h[-7],h[-14],h[-28],
+                           np.mean(h[-7:]),np.mean(h[-14:]),np.mean(h[-28:]),
+                           np.std(h[-7:]),np.std(h[-28:]),change])
         arr=np.asarray(lagged)
-        for c,v in zip(('lag_7','lag_14','lag_28','rolling_mean_7',
-                        'rolling_mean_28','price_change'),arr.T):
+        for c,v in zip(('lag_1','lag_2','lag_7','lag_14','lag_28',
+                        'rolling_mean_7','rolling_mean_14','rolling_mean_28',
+                        'rolling_std_7','rolling_std_28','price_change'),arr.T):
             rows[c]=v
         rows['day_of_week']=pd.Timestamp(day).dayofweek
+        rows['day_of_month']=pd.Timestamp(day).day
         rows['month']=pd.Timestamp(day).month
         rows['week_of_year']=int(pd.Timestamp(day).isocalendar().week)
         rows['is_weekend']=int(pd.Timestamp(day).dayofweek>=5)
